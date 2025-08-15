@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -15,17 +14,17 @@ class TicketController extends Controller
         return response()->json([
             'success' => true,
             'data'    => $ticket,
-            'message' => 'List Ticket'
+            'message' => 'List Ticket',
         ], 200);
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'event_id'    => 'required|exists:events,id',
-            'nama_tiket'  => 'required|string|max:255',
-            'harga'       => 'required|numeric|min:0',
-            'stok'        => 'required|integer|min:0',
+            'event_id'   => 'required|exists:events,id',
+            'nama_tiket' => 'required|string|max:255',
+            'harga'      => 'required|numeric|min:0',
+            'stok'       => 'required|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -37,31 +36,31 @@ class TicketController extends Controller
         return response()->json([
             'success' => true,
             'data'    => $ticket,
-            'message' => 'Ticket berhasil dibuat'
+            'message' => 'Ticket berhasil dibuat',
         ], 201);
     }
 
     public function show($id)
     {
         $ticket = Ticket::with('event')->find($id);
-        if (!$ticket) {
+        if (! $ticket) {
             return response()->json(['message' => 'Data Not Found'], 404);
         }
 
         return response()->json([
             'success' => true,
             'data'    => $ticket,
-            'message' => 'Detail Ticket'
+            'message' => 'Detail Ticket',
         ], 200);
     }
 
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'event_id'    => 'required|exists:events,id',
-            'nama_tiket'  => 'required|string|max:255',
-            'harga'       => 'required|numeric|min:0',
-            'stok'        => 'required|integer|min:0',
+            'event_id'   => 'required|exists:events,id',
+            'nama_tiket' => 'required|string|max:255',
+            'harga'      => 'required|numeric|min:0',
+            'stok'       => 'required|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -69,7 +68,7 @@ class TicketController extends Controller
         }
 
         $ticket = Ticket::find($id);
-        if (!$ticket) {
+        if (! $ticket) {
             return response()->json(['message' => 'Data Not Found'], 404);
         }
 
@@ -78,14 +77,14 @@ class TicketController extends Controller
         return response()->json([
             'success' => true,
             'data'    => $ticket,
-            'message' => 'Ticket berhasil diupdate'
+            'message' => 'Ticket berhasil diupdate',
         ], 200);
     }
 
     public function destroy($id)
     {
         $ticket = Ticket::find($id);
-        if (!$ticket) {
+        if (! $ticket) {
             return response()->json(['message' => 'Data Not Found'], 404);
         }
 
@@ -94,7 +93,29 @@ class TicketController extends Controller
         return response()->json([
             'success' => true,
             'data'    => $ticket,
-            'message' => 'Ticket berhasil dihapus'
+            'message' => 'Ticket berhasil dihapus',
         ], 200);
     }
+    // API: PUT /api/tickets/{id}/update-stok
+    public function updateStok(Request $request, $id)
+    {
+        $ticket = Ticket::find($id);
+        if (! $ticket) {
+            return response()->json(['message' => 'Ticket Not Found'], 404);
+        }
+
+        $request->validate([
+            'stok' => 'required|integer|min:0',
+        ]);
+
+        $ticket->stok = $request->stok;
+        $ticket->save();
+
+        return response()->json([
+            'success' => true,
+            'data'    => $ticket,
+            'message' => 'Stok tiket berhasil diupdate',
+        ], 200);
+    }
+
 }

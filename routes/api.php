@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\EventController;
-use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderItemController;
+use App\Http\Controllers\Api\TicketController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,5 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
 
     Route::resource('/posts', \App\Http\Controllers\Api\PostController::class);
+    Route::apiResource('/events', EventController::class);
+    Route::apiResource('/tickets', TicketController::class);
+    Route::apiResource('/orders', OrderController::class);
+    Route::apiResource('/order-items', OrderItemController::class);
+    Route::get('/orders/{order}/items', [OrderItemController::class, 'orderItems']);
 });
-
+Route::middleware('auth:sanctum')->put('/tickets/{id}/update-stok', [TicketController::class, 'updateStok']);

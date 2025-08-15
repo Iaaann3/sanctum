@@ -20,26 +20,34 @@ class OrderController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'nama_pemesan'  => 'required|string|max:255',
-            'email'         => 'required|email',
-            'total_harga'   => 'required|numeric|min:0',
-            'status'        => 'required|string|in:pending,paid,cancelled',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'no_hp'        => 'required|string|max:20',
+        'total_harga'  => 'required|numeric|min:0',
+        'status'       => 'required|string|in:pending,paid,cancelled',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-
-        $order = Order::create($request->all());
-
-        return response()->json([
-            'success' => true,
-            'data'    => $order,
-            'message' => 'Order berhasil dibuat'
-        ], 201);
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 400);
     }
+    
+
+    $order = Order::create([
+        'nama_pemesan' => auth()->user()->name,   
+        'email'        => auth()->user()->email,  
+        'no_hp'        => $request->no_hp,
+        'total_harga'  => $request->total_harga,
+        'status'       => $request->status,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'data'    => $order,
+        'message' => 'Order berhasil dibuat'
+    ], 201);
+}
+
+
 
     public function show($id)
     {

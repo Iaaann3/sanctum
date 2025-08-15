@@ -12,6 +12,9 @@ class Order extends Model
     protected $fillable = [
         'ticket_id',
         'jumlah',
+        'nama_pemesan',
+        'email',
+        'no_hp',
         'total_harga',
         'status',
     ];

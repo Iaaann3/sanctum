@@ -1,9 +1,7 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -15,10 +13,16 @@ class PostController extends Controller
 {
     public function index()
     {
-        $post = Post::latest()->get();
+        $post = Post::latest()->get()->map(function ($item) {
+            if ($item->foto) {
+                $item->foto = asset('storage/' . $item->foto);
+            }
+            return $item;
+        });
+
         $res = [
             'success' => true,
-            'data' => $post,
+            'data'    => $post,
             'message' => 'List Post',
         ];
         return response()->json($res, 200);
@@ -37,14 +41,14 @@ class PostController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $post = new Post;
+        $post          = new Post;
         $post->title   = $request->title;
         $post->slug    = Str::slug($request->title, '-');
         $post->content = $request->get('content');
         $post->status  = $request->status;
 
         if ($request->hasFile('foto')) {
-            $path = $request->file('foto')->store('posts', 'public');
+            $path       = $request->file('foto')->store('posts', 'public');
             $post->foto = $path;
         }
         $post->save();
@@ -60,7 +64,7 @@ class PostController extends Controller
     public function show($id)
     {
         $post = Post::find($id);
-        if (!$post) {
+        if (! $post) {
             return response()->json([
                 'message' => 'Data Not Found',
             ], 404);
@@ -92,7 +96,7 @@ class PostController extends Controller
         }
 
         $post = Post::find($id);
-        if (!$post) {
+        if (! $post) {
             return response()->json(['message' => 'Data Not Found'], 404);
         }
 
@@ -105,7 +109,7 @@ class PostController extends Controller
             if ($post->foto && Storage::disk('public')->exists($post->foto)) {
                 Storage::disk('public')->delete($post->foto);
             }
-            $path = $request->file('foto')->store('posts', 'public');
+            $path       = $request->file('foto')->store('posts', 'public');
             $post->foto = $path;
         }
         $post->save();
@@ -121,7 +125,7 @@ class PostController extends Controller
     public function destroy(string $id)
     {
         $post = Post::find($id);
-        if (!$post) {
+        if (! $post) {
             return response()->json(['message' => 'Data Not Found'], 404);
         }
 
